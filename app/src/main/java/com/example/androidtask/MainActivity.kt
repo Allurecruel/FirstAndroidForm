@@ -1,5 +1,7 @@
 package com.example.androidtask
 
+import BasicsCodelabTheme
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -10,13 +12,20 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            OnboardingPreview()
+            DefaultProview()
         }
     }
 
-    @Preview(showBackground = true, widthDp = 320, heightDp = 320)
+    @Preview(
+        showBackground = true,
+        widthDp = 320,
+        uiMode = UI_MODE_NIGHT_YES,
+        name = "DefaultPreviewDark"
+    )
     @Composable
-    fun OnboardingPreview() {
-        BasicApp().MyApp()
+    fun DefaultProview() {
+        BasicsCodelabTheme {
+            BasicApp().MyApp()
+        }
     }
 }
