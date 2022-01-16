@@ -54,11 +54,11 @@ class RegisterViewModel(initialState: RegisterState) : MavericksViewModel<Regist
         copy(isShowPassword = !isShowPassword)
     }
 
-    fun setMessage(message: String) = setState {
+    private fun setMessage(message: String) = setState {
         copy(message = message)
     }
 
-    fun setIsShowMsg(isShowMsg: Boolean) = setState {
+    private fun setIsShowMsg(isShowMsg: Boolean) = setState {
         copy(isShowMsg = isShowMsg)
     }
 

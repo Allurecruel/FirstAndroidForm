@@ -7,18 +7,18 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -100,14 +100,12 @@ class Form {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(200.dp, 50.dp)
-                        .background(Color.White, RoundedCornerShape(16.dp))
+                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
                 ) {
-                    Text("${viewModel.collectAsState{ it.message }.value}")
+                    Text(viewModel.collectAsState{ it.message }.value)
                 }
             }
         }
-
-
     }
 
     @Composable
@@ -118,16 +116,10 @@ class Form {
         val phone: String = viewModel.collectAsState{ it.phone }.value
         val isShowPassword: Boolean = viewModel.collectAsState{ it.isShowPassword }.value
 
-        // background image
-        Image(
-            painter = painterResource(id = R.drawable.login_background),
-            contentDescription = null,
-            alpha = 0.5f,
-            modifier = Modifier.fillMaxSize()
-        )
-
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -141,12 +133,15 @@ class Form {
             BasicRow(RowType.PHONE, "Phone", phone, isShowPassword, { viewModel.setPhone(it)}, { viewModel.setIsShowPassword()})
 
             Row(modifier = Modifier.padding(bottom = 15.dp, start = 200.dp)) {
-                Text("Create", fontSize = 15.sp, fontStyle = FontStyle.Italic, modifier = Modifier.padding(vertical = 15.dp))
-                IconButton(onClick = { viewModel.onRegister(userName, password, email, phone) }) {
+                TextButton(
+                    onClick = { viewModel.onRegister(userName, password, email, phone) }
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Login,
-                        contentDescription = null
+                        contentDescription = "Create",
+                        tint = Color.Black
                     )
+                    Text(text = "Create", color = Color.Black, fontStyle = FontStyle.Italic)
                 }
             }
         }
@@ -160,6 +155,14 @@ class Form {
         Box(
             contentAlignment = Alignment.Center
         ) {
+            // background image
+            Image(
+                painter = painterResource(id = R.drawable.login_background),
+                contentDescription = null,
+                alpha = 0.5f,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds
+            )
             PopupTip(viewModel)
             Form(viewModel)
         }
