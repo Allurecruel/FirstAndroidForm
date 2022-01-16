@@ -9,17 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import com.airbnb.mvrx.Mavericks
+import com.airbnb.mvrx.MavericksView
 import com.example.androidtask.state.RegisterViewModel
 import com.example.androidtask.ui.Form
 
 class MainActivity : AppCompatActivity() {
-
-    private val model by viewModels<RegisterViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Mavericks.initialize(this)
         setContent {
-            Form().Form(model)
+            Form().Form()
         }
     }
 }

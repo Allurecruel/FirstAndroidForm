@@ -20,16 +20,22 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.mvrx.compose.collectAsState
+import com.airbnb.mvrx.compose.mavericksViewModel
 import com.example.androidtask.R
-import com.example.androidtask.state.RegisterState
 import com.example.androidtask.state.RegisterViewModel
 import com.example.androidtask.state.RowType
 
 class Form {
     @Composable
-    private fun BasicRow(rowType: RowType, placeholder: String, text: String, onValueChanged: (String) -> Unit) {
-        var isShowPassword by remember { mutableStateOf(false) }
-
+    private fun BasicRow(
+        rowType: RowType,
+        placeholder: String,
+        text: String,
+        isShowPassword: Boolean,
+        onValueChanged: (String) -> Unit,
+        isShowPasswordChanged: () -> Unit
+    ) {
         Row(modifier = Modifier.padding(vertical = 8.dp)) {
             OutlinedTextField(
                 value = text,
@@ -61,7 +67,7 @@ class Form {
                 trailingIcon =
                 if (rowType === RowType.PASSWORD) {
                     {
-                        IconButton(onClick = { isShowPassword = !isShowPassword }) {
+                        IconButton(onClick = isShowPasswordChanged) {
                             Icon(
                                 imageVector = if (isShowPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                                 contentDescription = null
@@ -75,11 +81,14 @@ class Form {
     }
 
     @Composable
-    fun Form(viewModel: RegisterViewModel) {
-        var userName by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var email by remember { mutableStateOf("") }
-        var phone by remember { mutableStateOf("") }
+    fun Form() {
+        // viewModel
+        val viewModel: RegisterViewModel = mavericksViewModel()
+        val userName: String = viewModel.collectAsState{ it.userName }.value
+        val password: String = viewModel.collectAsState{ it.password }.value
+        val email: String = viewModel.collectAsState{ it.email }.value
+        val phone: String = viewModel.collectAsState{ it.phone }.value
+        val isShowPassword: Boolean = viewModel.collectAsState{ it.isShowPassword }.value
 
         // background image
         Image(
@@ -97,13 +106,15 @@ class Form {
             Row(modifier = Modifier.padding(bottom = 10.dp)) {
                 Text("Create Account", fontSize = 20.sp, fontStyle = FontStyle.Italic)
             }
-            BasicRow(RowType.USER_NAME, "User name", userName) { userName = it }
-            BasicRow(RowType.PASSWORD, "Password", password) { password = it }
-            BasicRow(RowType.EMAIL, "E-mail", email) { email = it }
-            BasicRow(RowType.PHONE, "Phone", phone) { phone = it }
+
+            BasicRow(RowType.USER_NAME, "User name", userName, isShowPassword, { viewModel.setUserName(it)}, { viewModel.setIsShowPassword()})
+            BasicRow(RowType.PASSWORD, "Password", password, isShowPassword, { viewModel.setPassword(it)}, { viewModel.setIsShowPassword()})
+            BasicRow(RowType.EMAIL, "E-mail", email, isShowPassword, { viewModel.setEmail(it)}, { viewModel.setIsShowPassword()})
+            BasicRow(RowType.PHONE, "Phone", phone, isShowPassword, { viewModel.setPhone(it)}, { viewModel.setIsShowPassword()})
+
             Row(modifier = Modifier.padding(bottom = 15.dp, start = 200.dp)) {
                 Text("Create", fontSize = 15.sp, fontStyle = FontStyle.Italic, modifier = Modifier.padding(vertical = 15.dp))
-                IconButton(onClick = { viewModel.onRegister(RegisterState(userName, password, email, phone)) }) {
+                IconButton(onClick = { viewModel.onRegister() }) {
                     Icon(
                         imageVector = Icons.Filled.Login,
                         contentDescription = null
