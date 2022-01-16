@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Mavericks.initialize(this)
         setContent {
-            Form().Form()
+            Form().App()
         }
     }
 }

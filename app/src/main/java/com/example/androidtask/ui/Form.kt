@@ -1,6 +1,11 @@
 package com.example.androidtask.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,9 +15,10 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -20,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import com.airbnb.mvrx.compose.collectAsState
 import com.airbnb.mvrx.compose.mavericksViewModel
 import com.example.androidtask.R
@@ -42,11 +49,11 @@ class Form {
                 onValueChange = onValueChanged,
                 shape = RoundedCornerShape(18.dp),
                 visualTransformation =
-                if (rowType === RowType.PASSWORD && !isShowPassword) {
-                    PasswordVisualTransformation()
-                } else {
-                    VisualTransformation.None
-                },
+                    if (rowType === RowType.PASSWORD && !isShowPassword) {
+                        PasswordVisualTransformation()
+                    } else {
+                        VisualTransformation.None
+                    },
                 keyboardOptions = KeyboardOptions(keyboardType = when(rowType) {
                     RowType.USER_NAME -> KeyboardType.Text
                     RowType.PASSWORD -> KeyboardType.Password
@@ -65,25 +72,46 @@ class Form {
                     )
                 },
                 trailingIcon =
-                if (rowType === RowType.PASSWORD) {
-                    {
-                        IconButton(onClick = isShowPasswordChanged) {
-                            Icon(
-                                imageVector = if (isShowPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = null
-                            )
+                    if (rowType === RowType.PASSWORD) {
+                        {
+                            IconButton(onClick = isShowPasswordChanged) {
+                                Icon(
+                                    imageVector = if (isShowPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = null
+                                )
+                            }
                         }
-                    }
-                } else null,
+                    } else null,
                 placeholder = { Text(placeholder) }
             )
         }
     }
 
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
-    fun Form() {
-        // viewModel
-        val viewModel: RegisterViewModel = mavericksViewModel()
+    fun PopupTip(viewModel: RegisterViewModel) {
+        Popup(alignment = Alignment.TopCenter) {
+            AnimatedVisibility(
+                visible = viewModel.collectAsState{ it.isShowMsg }.value,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(200.dp, 50.dp)
+                        .background(Color.White, RoundedCornerShape(16.dp))
+                ) {
+                    Text("${viewModel.collectAsState{ it.message }.value}")
+                }
+            }
+        }
+
+
+    }
+
+    @Composable
+    fun Form(viewModel: RegisterViewModel) {
         val userName: String = viewModel.collectAsState{ it.userName }.value
         val password: String = viewModel.collectAsState{ it.password }.value
         val email: String = viewModel.collectAsState{ it.email }.value
@@ -114,13 +142,26 @@ class Form {
 
             Row(modifier = Modifier.padding(bottom = 15.dp, start = 200.dp)) {
                 Text("Create", fontSize = 15.sp, fontStyle = FontStyle.Italic, modifier = Modifier.padding(vertical = 15.dp))
-                IconButton(onClick = { viewModel.onRegister() }) {
+                IconButton(onClick = { viewModel.onRegister(userName, password, email, phone) }) {
                     Icon(
                         imageVector = Icons.Filled.Login,
                         contentDescription = null
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    fun App() {
+        // viewModel
+        val viewModel: RegisterViewModel = mavericksViewModel()
+
+        Box(
+            contentAlignment = Alignment.Center
+        ) {
+            PopupTip(viewModel)
+            Form(viewModel)
         }
     }
 }
