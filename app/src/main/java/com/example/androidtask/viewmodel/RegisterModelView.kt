@@ -1,4 +1,4 @@
-package com.example.androidtask.state
+package com.example.androidtask.viewmodel
 
 import android.telephony.PhoneNumberUtils
 import android.text.TextUtils

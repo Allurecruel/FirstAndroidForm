@@ -30,8 +30,8 @@ import androidx.compose.ui.window.Popup
 import com.airbnb.mvrx.compose.collectAsState
 import com.airbnb.mvrx.compose.mavericksViewModel
 import com.example.androidtask.R
-import com.example.androidtask.state.RegisterViewModel
-import com.example.androidtask.state.RowType
+import com.example.androidtask.viewmodel.RegisterViewModel
+import com.example.androidtask.viewmodel.RowType
 
 class Form {
     @Composable
